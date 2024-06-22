@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ESP32 Network Configuration</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #network-form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="checkbox"] {
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        function toggleCheckbox(checkbox) {
+            var ethernetCheckbox = document.getElementById("ethernet-checkbox");
+            var wifiCheckbox = document.getElementById("wifi-checkbox");
+
+            if (checkbox.id === "ethernet-checkbox" && checkbox.checked) {
+                wifiCheckbox.checked = false;
+            } else if (checkbox.id === "wifi-checkbox" && checkbox.checked) {
+                ethernetCheckbox.checked = false;
+            } else if (!ethernetCheckbox.checked && !wifiCheckbox.checked) {
+                wifiCheckbox.checked = true;
+            }
+
+            var username = document.getElementById("username");
+            var password = document.getElementById("password");
+
+            if (checkbox.id === "ethernet-checkbox") {
+                username.disabled = checkbox.checked;
+                password.disabled = checkbox.checked;
+                username.value = "";
+                password.value = "";
+            }else{
+                username.disabled = false;
+                password.disabled = false;
+            }
+        }
+
+        function sendFormData() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            var mqttHost = document.getElementById("mqtt-host").value;
+            var ethernet = document.getElementById("ethernet-checkbox").checked;
+            var wifi = document.getElementById("wifi-checkbox").checked;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/network-config", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify({
+                "username": username,
+                "password": password,
+                "mqttHost": mqttHost,
+                "ethernet": ethernet,
+                "wifi": wifi
+            }));
+        }
+    </script>
+</head>
+<body>
+    <div id="network-form-container">
+        <h1>ESP32 Network Configuration</h1>
+        <form id="network-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"><br>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password"><br>
+
+            <label for="mqtt-host">MQTT Host:</label>
+            <input type="text" id="mqtt-host" name="mqtt-host"><br>
+            
+            <label for="ethernet-checkbox">Ethernet</label>
+            <input type="checkbox" id="ethernet-checkbox" name="ethernet-checkbox" onclick="toggleCheckbox(this)"><br>
+            
+            <label for="wifi-checkbox">Wi-Fi</label>
+            <input type="checkbox" id="wifi-checkbox" name="wifi-checkbox" onclick="toggleCheckbox(this)" checked><br>
+            
+            <button type="button" onclick="sendFormData()">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
